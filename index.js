@@ -28,6 +28,11 @@ async function run() {
     const usersCollection = client.db("assignmentTwelve").collection("users");
 
     // users related API
+    app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
