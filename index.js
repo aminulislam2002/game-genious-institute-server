@@ -101,11 +101,10 @@ async function run() {
       res.send(result);
     });
 
-
     app.patch("/users/role/:id", async (req, res) => {
       const id = req.params.id;
       const { role } = req.body;
-      
+
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
@@ -113,6 +112,13 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
       res.send(result);
     });
 
