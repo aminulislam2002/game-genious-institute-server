@@ -1,5 +1,6 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
@@ -26,6 +27,12 @@ async function run() {
     await client.connect();
 
     const usersCollection = client.db("assignmentTwelve").collection("users");
+
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+      res.send({ token });
+    });
 
     // users related API
     app.get("/users", async (req, res) => {
