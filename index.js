@@ -68,21 +68,50 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (req.decoded.email !== email) {
+        res.send({ admin: false });
+      }
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
+    app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (req.decoded.email !== email) {
+        res.send({ instructor: false });
+      }
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const result = { instructor: user?.role === "instructor" };
+      res.send(result);
+    });
+
+    app.get("/users/student/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (req.decoded.email !== email) {
+        res.send({ student: false });
+      }
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const result = { student: user?.role === "student" };
+      res.send(result);
+    });
+
+
     app.patch("/users/role/:id", async (req, res) => {
       const id = req.params.id;
       const { role } = req.body;
-      const validRoles = ["admin", "instructor"];
-
-      if (!validRoles.includes(role)) {
-        return res.status(400).send({ error: true, message: "Invalid role." });
-      }
+      
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
           role: role,
         },
       };
-
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
