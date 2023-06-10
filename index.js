@@ -44,6 +44,8 @@ async function run() {
     await client.connect();
 
     const usersCollection = client.db("assignmentTwelve").collection("users");
+    const instructorsCollection = client.db("assignmentTwelve").collection("instructors");
+    const classesCollection = client.db("assignmentTwelve").collection("classes");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -119,6 +121,13 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // classes related API
+    app.post("/classes", async (req, res) => {
+      const classData = req.body;
+      const result = await classesCollection.insertOne(classData);
       res.send(result);
     });
 
