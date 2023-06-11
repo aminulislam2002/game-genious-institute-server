@@ -164,7 +164,13 @@ async function run() {
     });
 
     app.get("/classes", async (req, res) => {
-      const result = await classesCollection.find().toArray();
+      let query = {};
+      if (req.query?.instructorEmail) {
+        query = { instructorEmail: req.query.instructorEmail };
+      } else if (req.query?.status) {
+        query.status = req.query.status;
+      }
+      const result = await classesCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -187,6 +193,7 @@ async function run() {
           image: updatedClass.image,
           instructorName: updatedClass.instructorName,
           instructorEmail: updatedClass.instructorEmail,
+          availableSeats: updatedClass.availableSeats,
           price: updatedClass.price,
         },
       };
