@@ -74,6 +74,16 @@ async function run() {
       next();
     };
 
+    const verifyStudent = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user?.role !== "student") {
+        return res.status(403).send({ error: true, message: "forbidden message" });
+      }
+      next();
+    };
+
     // users related API
     app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
