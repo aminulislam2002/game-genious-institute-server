@@ -168,12 +168,31 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/classes/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const filter = { _id: new ObjectId(id) };
-    //   const result = await classesCollection.findOne(filter);
-    //   res.send(result);
-    // });
+    app.get("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await classesCollection.findOne(filter);
+      res.send(result);
+    });
+
+    app.put("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedClass = req.body;
+      const updateClass = {
+        $set: {
+          name: updatedClass.name,
+          description: updatedClass.description,
+          image: updatedClass.image,
+          instructorName: updatedClass.instructorName,
+          instructorEmail: updatedClass.instructorEmail,
+          price: updatedClass.price,
+        },
+      };
+      const result = await classesCollection.updateOne(filter, updateClass, options);
+      res.send(result);
+    });
 
     app.patch("/classes/status/:id", async (req, res) => {
       const id = req.params.id;
