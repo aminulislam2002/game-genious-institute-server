@@ -43,9 +43,10 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const usersCollection = client.db("assignmentTwelve").collection("users");
-    const instructorsCollection = client.db("assignmentTwelve").collection("instructors");
-    const classesCollection = client.db("assignmentTwelve").collection("classes");
+    const db = client.db("assignmentTwelve");
+    const usersCollection = db.collection("users");
+    const instructorsCollection = db.collection("instructors");
+    const classesCollection = db.collection("classes");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -53,7 +54,7 @@ async function run() {
       res.send({ token });
     });
 
-    // verify admin instructor and student
+    // verify admin, instructor, and student
     const verifyAdmin = async (req, res, next) => {
       const email = req.decoded.email;
       const query = { email: email };
@@ -85,7 +86,7 @@ async function run() {
     };
 
     // users related API
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
@@ -185,6 +186,20 @@ async function run() {
         },
       };
 
+      const result = await classesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.patch("/classes/feedback/:id", async (req, res) => {
+      const id = req.params.id;
+      const { feedback } = req.body;
+
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          feedback: feedback,
+        },
+      };
       const result = await classesCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
