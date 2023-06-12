@@ -91,6 +91,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
@@ -238,6 +245,22 @@ async function run() {
           feedback: feedback,
         },
       };
+      const result = await classesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.patch("/classes/seat/:id", async (req, res) => {
+      const id = req.params.id;
+      const { selectedClass, availableSeats } = req.body;
+
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          selectedClass: selectedClass,
+          availableSeats: availableSeats,
+        },
+      };
+
       const result = await classesCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
