@@ -157,20 +157,32 @@ async function run() {
     });
 
     // classes related API
-    app.post("/classes", async (req, res) => {
-      const classData = req.body;
-      const result = await classesCollection.insertOne(classData);
-      res.send(result);
-    });
-
     app.get("/classes", async (req, res) => {
       let query = {};
-      if (req.query?.instructorEmail) {
-        query = { instructorEmail: req.query.instructorEmail };
-      } else if (req.query?.status) {
+      if (req.query?.status) {
         query.status = req.query.status;
       }
       const result = await classesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/manageClasses", verifyJWT, verifyAdmin, async (req, res) => {
+      const result = await classesCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/myClasses", async (req, res) => {
+      let query = {};
+      if (req.query?.instructorEmail) {
+        query = { instructorEmail: req.query.instructorEmail };
+      }
+      const result = await classesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post("/classes", async (req, res) => {
+      const classData = req.body;
+      const result = await classesCollection.insertOne(classData);
       res.send(result);
     });
 
