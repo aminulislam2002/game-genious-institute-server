@@ -45,7 +45,6 @@ async function run() {
 
     const db = client.db("assignmentTwelve");
     const usersCollection = db.collection("users");
-    const instructorsCollection = db.collection("instructors");
     const classesCollection = db.collection("classes");
 
     app.post("/jwt", (req, res) => {
@@ -140,6 +139,13 @@ async function run() {
       const user = await usersCollection.findOne(query);
       const result = { student: user?.role === "student" };
       res.send(result);
+    });
+
+    app.get("/users/instructors", async (req, res) => {
+      const query = { role: "instructor" };
+      console.log(query);
+      const instructors = await usersCollection.find(query).toArray();
+      res.send(instructors);
     });
 
     app.patch("/users/role/:id", async (req, res) => {
