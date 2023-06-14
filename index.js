@@ -46,6 +46,7 @@ async function run() {
     const db = client.db("assignmentTwelve");
     const usersCollection = db.collection("users");
     const classesCollection = db.collection("classes");
+    const selectedClassesCollection = db.collection("selectedClasses");
 
     app.post("/jwt", (req, res) => {
       const user = req.body;
@@ -97,17 +98,6 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/users", async (req, res) => {
-      const user = req.body;
-      const query = { email: user.email };
-      const existingUser = await usersCollection.findOne(query);
-      if (existingUser) {
-        return res.send({ message: "user already exists" });
-      }
-      const result = await usersCollection.insertOne(user);
-      res.send(result);
-    });
-
     app.get("/users/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       if (req.decoded.email !== email) {
@@ -143,9 +133,19 @@ async function run() {
 
     app.get("/users/instructors", async (req, res) => {
       const query = { role: "instructor" };
-      console.log(query);
       const instructors = await usersCollection.find(query).toArray();
       res.send(instructors);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email };
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "user already exists" });
+      }
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
     });
 
     app.patch("/users/role/:id", async (req, res) => {
@@ -193,16 +193,31 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await classesCollection.findOne(filter);
+      res.send(result);
+    });
+
+    app.get("/selectedClasses", async (req, res) => {
+      let query = {};
+      if (req.query?.userEmail) {
+        query = { userEmail: req.query.userEmail };
+      }
+      const result = await selectedClassesCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/classes", async (req, res) => {
       const classData = req.body;
       const result = await classesCollection.insertOne(classData);
       res.send(result);
     });
 
-    app.get("/classes/:id", async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const result = await classesCollection.findOne(filter);
+    app.post("/selectedClasses", async (req, res) => {
+      const classData = req.body;
+      const result = await selectedClassesCollection.insertOne(classData);
       res.send(result);
     });
 
@@ -257,17 +272,24 @@ async function run() {
 
     app.patch("/classes/seat/:id", async (req, res) => {
       const id = req.params.id;
-      const { selectedClass, availableSeats } = req.body;
+      const { availableSeats, selectedSeats } = req.body;
 
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          selectedClass: selectedClass,
           availableSeats: availableSeats,
+          selectedSeats: selectedSeats,
         },
       };
 
       const result = await classesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.delete("/selectedClasses/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: id };
+      const result = await selectedClassesCollection.deleteOne(query);
       res.send(result);
     });
 
