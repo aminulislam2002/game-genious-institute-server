@@ -270,25 +270,9 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/classes/seat/:id", async (req, res) => {
-      const id = req.params.id;
-      const { availableSeats, selectedSeats } = req.body;
-
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          availableSeats: availableSeats,
-          selectedSeats: selectedSeats,
-        },
-      };
-
-      const result = await classesCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    });
-
     app.delete("/selectedClasses/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: id };
+      const query = { _id: new ObjectId(id) };
       const result = await selectedClassesCollection.deleteOne(query);
       res.send(result);
     });
