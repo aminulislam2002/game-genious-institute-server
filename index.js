@@ -147,7 +147,7 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
-
+ 
     app.patch("/users/role/:id", async (req, res) => {
       const id = req.params.id;
       const { role } = req.body;
