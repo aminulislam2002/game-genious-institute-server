@@ -184,7 +184,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/myClasses", verifyJWT, verifyInstructor, async (req, res) => {
+    app.get("/myClasses", async (req, res) => {
       let query = {};
       if (req.query?.instructorEmail) {
         query = { instructorEmail: req.query.instructorEmail };
@@ -200,7 +200,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/selectedClasses", verifyJWT, verifyStudent, async (req, res) => {
+    app.get("/selectedClasses", async (req, res) => {
       let query = {};
       if (req.query?.userEmail) {
         query = { userEmail: req.query.userEmail };
